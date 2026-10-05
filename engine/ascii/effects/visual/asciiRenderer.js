@@ -82,4 +82,14 @@ export function drawAscii(ctx, ascii) {
     }
 
     ctx.restore();
+
+    return {
+        offsetX,
+        offsetY,
+        scale,
+        characterWidth: scaledCharacterWidth,
+        characterHeight: scaledCharacterHeight,
+        width: scaledWidth,
+        height: scaledHeight
+    };
 }

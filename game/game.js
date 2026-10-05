@@ -8,10 +8,13 @@ import {
     upCursor,
     rightCursor,
     downCursor,
-    leftCursor
+    leftCursor,
+    upRightCursor
 } from "./assets/ascii/cursors/arrows.js";
 
-import { normalCursor } from "./assets/ascii/cursors/normal.js";
+import {
+    normalCursor
+} from "./assets/ascii/cursors/normal.js";
 
 import {
     startAsciiAnimation
@@ -23,22 +26,38 @@ import {
 } from "../engine/ascii/effects/visual/asciiRenderer.js";
 
 
+// ==================================================
+// CONSTANTS
+// ==================================================
+
+const DEV_MODE = true;
+
+const START_SCENE = "ceiling";
+
 const NAVIGATION_EDGE_RATIO = 0.05;
-const NAVIGATION_CURSORS = {
+
+const CURSORS = {
     up: upCursor,
     right: rightCursor,
     down: downCursor,
-    left: leftCursor
+    left: leftCursor,
+    upRight: upRightCursor
 };
 
 
-const START_SCENE = "ceiling";
+// ==================================================
+// DOM / STATE
+// ==================================================
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
+let artworkGeometry = null;
 let currentScene = null;
 let currentAnimation = null;
+
+let devCoordinateDisplay = null;
+
 
 // ==================================================
 // CANVAS
@@ -50,20 +69,100 @@ window.addEventListener("resize", () => {
     resizeCanvas(canvas);
 });
 
-/* 
- * Function to determine which edge of the canvas the mouse is near.
- * Returns "N", "E", "S", "W" for top, right, bottom, left respectively.
- * Returns null if the mouse is not near any edge or is in a corner.
- */
+
+// ==================================================
+// DEVELOPER TOOLS
+// ==================================================
+
+function createDevTools() {
+    if (!DEV_MODE) {
+        return;
+    }
+
+    devCoordinateDisplay = document.createElement("div");
+
+    devCoordinateDisplay.style.position = "fixed";
+    devCoordinateDisplay.style.top = "10px";
+    devCoordinateDisplay.style.left = "10px";
+    devCoordinateDisplay.style.zIndex = "10000";
+    devCoordinateDisplay.style.fontFamily = "monospace";
+    devCoordinateDisplay.style.fontSize = "14px";
+    devCoordinateDisplay.style.color = "white";
+    devCoordinateDisplay.style.background = "black";
+    devCoordinateDisplay.style.padding = "4px 6px";
+    devCoordinateDisplay.style.pointerEvents = "none";
+
+    document.body.appendChild(devCoordinateDisplay);
+}
+
+
+function getArtworkPosition(mouseX, mouseY) {
+    if (!artworkGeometry) {
+        return null;
+    }
+
+    const {
+        offsetX,
+        offsetY,
+        characterWidth,
+        characterHeight
+    } = artworkGeometry;
+
+    const column = Math.floor(
+        (mouseX * window.devicePixelRatio - offsetX) /
+        characterWidth
+    );
+
+    const row = Math.floor(
+        (mouseY * window.devicePixelRatio - offsetY) /
+        characterHeight
+    );
+
+    return {
+        column,
+        row
+    };
+}
+
+
+function updateDevCoordinateDisplay(position) {
+    if (!DEV_MODE || !devCoordinateDisplay) {
+        return;
+    }
+
+    if (!position) {
+        devCoordinateDisplay.textContent = "";
+        return;
+    }
+
+    devCoordinateDisplay.textContent =
+        `Column: ${position.column}  Row: ${position.row}`;
+}
+
+
+// ==================================================
+// NAVIGATION
+// ==================================================
 
 function getEdgeNavigation(mouseX, mouseY) {
-    const edgeWidth = canvas.clientWidth * NAVIGATION_EDGE_RATIO;
-    const edgeHeight = canvas.clientHeight * NAVIGATION_EDGE_RATIO;
+    const edgeWidth =
+        canvas.clientWidth * NAVIGATION_EDGE_RATIO;
 
-    const nearLeft = mouseX < edgeWidth;
-    const nearRight = mouseX > canvas.clientWidth - edgeWidth;
-    const nearTop = mouseY < edgeHeight;
-    const nearBottom = mouseY > canvas.clientHeight - edgeHeight;
+    const edgeHeight =
+        canvas.clientHeight * NAVIGATION_EDGE_RATIO;
+
+    const nearLeft =
+        mouseX < edgeWidth;
+
+    const nearRight =
+        mouseX > canvas.clientWidth - edgeWidth;
+
+    const nearTop =
+        mouseY < edgeHeight;
+
+    const nearBottom =
+        mouseY > canvas.clientHeight - edgeHeight;
+
 
     // Corners are dead zones.
     if (
@@ -74,6 +173,7 @@ function getEdgeNavigation(mouseX, mouseY) {
     ) {
         return null;
     }
+
 
     if (nearTop) {
         return "up";
@@ -94,29 +194,70 @@ function getEdgeNavigation(mouseX, mouseY) {
     return null;
 }
 
-/* Function to update the cursor state based on the mouse position. */
+function getNavigationArea(mouseX, mouseY) {
+    if (!currentScene.navigationAreas) {
+        return null;
+    }
+
+    const position = getArtworkPosition(mouseX, mouseY);
+
+    for (const navigationArea of currentScene.navigationAreas) {
+        const { column, row, width, height } =
+            navigationArea.area;
+
+        if (
+            position.column >= column &&
+            position.column < column + width &&
+            position.row >= row &&
+            position.row < row + height
+        ) {
+            return navigationArea;
+        }
+    }
+
+    return null;
+}
+
+function navigate(direction) {
+    const nextScene =
+        currentScene.navigation?.[direction];
+
+    if (!nextScene) {
+        return;
+    }
+
+    loadScene(nextScene);
+}
+
+
+// ==================================================
+// CURSOR
+// ==================================================
+
 function updateCursorState(mouseX, mouseY) {
-    const direction = getEdgeNavigation(mouseX, mouseY);
+    const direction =
+        getEdgeNavigation(mouseX, mouseY);
 
     if (!direction) {
         setCursor(normalCursor);
         return;
     }
 
-    const nextScene = currentScene.navigation?.[direction];
+    const nextScene =
+        currentScene.navigation?.[direction];
 
     if (!nextScene) {
         setCursor(normalCursor);
         return;
     }
 
-    setCursor(NAVIGATION_CURSORS[direction]);
+    setCursor(CURSORS[direction]);
 }
+
 
 // ==================================================
 // SCENES
 // ==================================================
-
 
 function loadScene(sceneId) {
     const scene = SCENES[sceneId];
@@ -139,26 +280,45 @@ function loadScene(sceneId) {
 
 
 // ==================================================
-// NAVIGATION
+// MOUSE EVENTS
 // ==================================================
 
-/* Function to navigate to the next scene based on the given direction. */
-function navigate(direction) {
-    const nextScene = currentScene.navigation?.[direction];
-
-    if (!nextScene) {
-        return;
-    }
-
-    loadScene(nextScene);
-}
-
 canvas.addEventListener("mousemove", (event) => {
-    updateCursorState(
+    const position = getArtworkPosition(
         event.offsetX,
         event.offsetY
     );
+
+    updateDevCoordinateDisplay(position);
+
+    const edgeDirection = getEdgeNavigation(
+        event.offsetX,
+        event.offsetY
+    );
+
+    if (edgeDirection) {
+        const nextScene =
+            currentScene.navigation?.[edgeDirection];
+
+        if (nextScene) {
+            setCursor(CURSORS[edgeDirection]);
+            return;
+        }
+    }
+
+    const navigationArea = getNavigationArea(
+        event.offsetX,
+        event.offsetY
+    );
+
+    if (navigationArea) {
+        setCursor(CURSORS[navigationArea.cursor]);
+        return;
+    }
+
+    setCursor(normalCursor);
 });
+
 
 canvas.addEventListener("click", (event) => {
     const direction = getEdgeNavigation(
@@ -166,17 +326,38 @@ canvas.addEventListener("click", (event) => {
         event.offsetY
     );
 
-    if (!direction) {
+    if (direction) {
+        navigate(direction);
+
+        updateCursorState(
+            event.offsetX,
+            event.offsetY
+        );
+
         return;
     }
 
-    navigate(direction);
-});
+    const navigationArea = getNavigationArea(
+        event.offsetX,
+        event.offsetY
+    );
+
+    if (navigationArea) {
+        loadScene(navigationArea.destination);
+
+        updateCursorState(
+            event.offsetX,
+            event.offsetY
+        );
+    }
+    });
 
 
 // ==================================================
 // START GAME
 // ==================================================
+
+createDevTools();
 
 loadScene(START_SCENE);
 
@@ -186,7 +367,10 @@ loadScene(START_SCENE);
 // ==================================================
 
 function render() {
-    drawAscii(ctx, currentAnimation.frame);
+    artworkGeometry = drawAscii(
+        ctx,
+        currentAnimation.frame
+    );
 
     requestAnimationFrame(render);
 }
