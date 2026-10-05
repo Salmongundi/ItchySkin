@@ -1,8 +1,4 @@
-import {
-    ceilingFan_001,
-    ceilingFan_002,
-    ceilingFan_003
-} from "./assets/ascii/environments/ceiling.js";
+import { SCENES } from "./scenes.js";
 
 import {
     startAsciiAnimation
@@ -14,8 +10,18 @@ import {
 } from "../engine/ascii/effects/visual/asciiRenderer.js";
 
 
+const START_SCENE = "ceiling";
+
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
+
+let currentScene = null;
+let currentAnimation = null;
+
+
+// ==================================================
+// CANVAS
+// ==================================================
 
 resizeCanvas(canvas);
 
@@ -24,20 +30,69 @@ window.addEventListener("resize", () => {
 });
 
 
-const animation = startAsciiAnimation(
-    [
-        ceilingFan_001,
-        ceilingFan_002,
-        ceilingFan_003
-    ],
-    {
-        frameDuration: 800
-    }
-);
+// ==================================================
+// SCENES
+// ==================================================
 
+function loadScene(sceneId) {
+    const scene = SCENES[sceneId];
+
+    if (!scene) {
+        throw new Error(`Scene not found: ${sceneId}`);
+    }
+
+    currentScene = scene;
+
+    currentAnimation?.stop();
+
+    currentAnimation = startAsciiAnimation(
+        scene.animation.frames,
+        {
+            frameDuration: scene.animation.frameDuration
+        }
+    );
+}
+
+
+// ==================================================
+// NAVIGATION
+// ==================================================
+
+function navigate(direction) {
+    const nextScene = currentScene.exits?.[direction];
+
+    if (!nextScene) {
+        return;
+    }
+
+    loadScene(nextScene);
+}
+
+window.addEventListener("keydown", (event) => {
+    if (event.key === "ArrowLeft") {
+        navigate("left");
+    }
+
+    if (event.key === "ArrowRight") {
+        navigate("right");
+    }
+});
+
+
+// ==================================================
+// START GAME
+// ==================================================
+
+loadScene(START_SCENE);
+
+
+// ==================================================
+// RENDER
+// ==================================================
 
 function render() {
-    drawAscii(ctx, animation.frame);
+    drawAscii(ctx, currentAnimation.frame);
+
     requestAnimationFrame(render);
 }
 

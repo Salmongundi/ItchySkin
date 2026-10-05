@@ -1,6 +1,7 @@
 export function startAsciiAnimation(frames, {
     frameDuration = 800,
-    loop = true
+    loop = true,
+    onFrameChange = null
 } = {}) {
     let frameIndex = 0;
     let timer = null;
@@ -18,6 +19,7 @@ export function startAsciiAnimation(frames, {
         reset() {
             animation.stop();
             frameIndex = 0;
+            onFrameChange?.(animation.frame);
             play();
         }
     };
@@ -36,10 +38,13 @@ export function startAsciiAnimation(frames, {
                 frameIndex = 0;
             }
 
+            onFrameChange?.(animation.frame);
+
             play();
         }, frameDuration);
     }
 
+    onFrameChange?.(animation.frame);
     play();
 
     return animation;
