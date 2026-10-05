@@ -1,79 +1,44 @@
 import {
-    findInterior
-} from "../engine/ascii/geometry/findInterior.js";
+    ceilingFan_001,
+    ceilingFan_002,
+    ceilingFan_003
+} from "./assets/ascii/environments/ceiling.js";
 
 import {
-    startMites
-} from "../engine/ascii/effects/overlay/mites.js";
+    startAsciiAnimation
+} from "../engine/ascii/effects/animation/asciiAnimation.js";
 
 import {
-    startSkinMounds
-} from "../engine/ascii/effects/overlay/skinMounds.js";
-
-import {
-    itchSurface
-} from "./assets/ascii/props/itchSurface.js";
-
-import {
-    skinMounds
-} from "./assets/ascii/props/skinMounds.js";
+    resizeCanvas,
+    drawAscii
+} from "../engine/ascii/effects/visual/asciiRenderer.js";
 
 
-// ==================================================
-// SCENE
-// ==================================================
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
 
-const scene = {
+resizeCanvas(canvas);
 
-    surface: itchSurface
-
-};
-
-
-// ==================================================
-// ELEMENTS
-// ==================================================
-
-const asciiElement =
-    document.getElementById("ascii");
+window.addEventListener("resize", () => {
+    resizeCanvas(canvas);
+});
 
 
-// ==================================================
-// RENDER SCENE
-// ==================================================
-
-asciiElement.textContent =
-    scene.surface;
-
-
-// ==================================================
-// FIND INTERIOR
-// ==================================================
-
-const interior =
-    findInterior(
-        scene.surface,
-        {
-            minClearance: 2,
-            maxClearance: 12
-        }
-    );
-
-
-// ==================================================
-// EFFECTS
-// ==================================================
-
-startMites(
-    asciiElement,
-    interior
-);
-
-
-startSkinMounds(
-    asciiElement,
-    interior,
+const animation = startAsciiAnimation(
+    [
+        ceilingFan_001,
+        ceilingFan_002,
+        ceilingFan_003
+    ],
     {
-        arts: skinMounds
+        frameDuration: 800
     }
 );
+
+
+function render() {
+    drawAscii(ctx, animation.frame);
+    requestAnimationFrame(render);
+}
+
+render();
