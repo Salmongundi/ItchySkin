@@ -1,7 +1,10 @@
 import {
     bathroomEntrance_001,
     bathroomEntrance_002,
-    bathroomEntrance_003
+    bathroomEntrance_003,
+    showerInterior_001,
+    showerInterior_002,
+    showerInterior_003,
 } from "./assets/ascii/environments/bathroom.js";
 
 import {
@@ -70,7 +73,6 @@ export const SCENES = {
 
         navigationAreas: [
             {
-                name: "bathroomHallway",
                 destination: "bathroomEntrance",
 
                 area: {
@@ -100,6 +102,39 @@ export const SCENES = {
 
         navigation: {
             down: "bedWall"
+        },
+
+        navigationAreas: [
+            {
+                destination: "showerInterior",
+
+                area: {
+                    column: 88,
+                    row: 4,
+                    width: 55,
+                    height: 45
+                },
+
+                cursor: "upRight"
+            }
+        ]
+    },
+
+    showerInterior: {
+        animation: {
+            frames: [
+                showerInterior_001,
+                showerInterior_002,
+                showerInterior_003,
+                showerInterior_002
+            ],
+            frameDuration: 550
+        },
+
+        props: [],
+
+        navigation: {
+            down: "bathroomEntrance"
         }
     }
 
