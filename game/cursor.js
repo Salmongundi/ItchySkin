@@ -1,67 +1,102 @@
-export function startCursor(hands) {
+import { normalCursor } from "./assets/ascii/cursors/normal.js";
 
-    const customCursor =
-        document.getElementById("custom-cursor");
+const CURSOR_FONT_FAMILY = "monospace";
 
+let cursorElement = null;
+let currentCursor = null;
 
-    function setCursorArt(art) {
-
-        customCursor.textContent =
-            art;
-
-    }
+let characterWidth = 0;
+let characterHeight = 0;
 
 
-    function moveCursor(event) {
+// ==================================================
+// SETUP
+// ==================================================
 
-        customCursor.style.left =
-            `${event.clientX}px`;
+function createCursorElement() {
+    cursorElement = document.createElement("pre");
 
-        customCursor.style.top =
-            `${event.clientY}px`;
+    cursorElement.style.position = "fixed";
+    cursorElement.style.margin = "0";
+    cursorElement.style.padding = "0";
 
-        customCursor.style.display =
-            "block";
+    cursorElement.style.fontFamily = CURSOR_FONT_FAMILY;
+    cursorElement.style.lineHeight = "1";
 
-    }
+    cursorElement.style.pointerEvents = "none";
+    cursorElement.style.zIndex = "9999";
 
+    cursorElement.style.whiteSpace = "pre";
 
-    function cursorDown() {
+    document.body.style.cursor = "none";
 
-        setCursorArt(
-            hands.clicked
-        );
-
-    }
-
-
-    function cursorUp() {
-
-        setCursorArt(
-            hands.idle
-        );
-
-    }
-
-
-    setCursorArt(
-        hands.idle
-    );
-
-
-    document.addEventListener(
-        "mousemove",
-        moveCursor
-    );
-
-    document.addEventListener(
-        "mousedown",
-        cursorDown
-    );
-
-    document.addEventListener(
-        "mouseup",
-        cursorUp
-    );
-
+    document.body.appendChild(cursorElement);
 }
+
+
+// ==================================================
+// MEASUREMENT
+// ==================================================
+
+function measureCharacterSize(fontSize) {
+    const measurementCanvas = document.createElement("canvas");
+    const measurementContext = measurementCanvas.getContext("2d");
+
+    measurementContext.font =
+        `${fontSize}px ${CURSOR_FONT_FAMILY}`;
+
+    characterWidth =
+        measurementContext.measureText("M").width;
+
+    characterHeight = fontSize;
+}
+
+
+// ==================================================
+// CURSOR
+// ==================================================
+
+export function setCursor(cursor) {
+    currentCursor = cursor;
+
+    cursorElement.textContent = cursor.artwork;
+
+    cursorElement.style.fontSize =
+        `${cursor.fontSize}px`;
+
+    measureCharacterSize(cursor.fontSize);
+}
+
+
+// ==================================================
+// MOUSE
+// ==================================================
+
+function updatePosition(event) {
+    if (!currentCursor) {
+        return;
+    }
+
+    const offsetX =
+        currentCursor.hotspot.column * characterWidth;
+
+    const offsetY =
+        currentCursor.hotspot.row * characterHeight;
+
+    cursorElement.style.left =
+        `${event.clientX - offsetX}px`;
+
+    cursorElement.style.top =
+        `${event.clientY - offsetY}px`;
+}
+
+
+// ==================================================
+// START
+// ==================================================
+
+createCursorElement();
+
+setCursor(normalCursor);
+
+window.addEventListener("mousemove", updatePosition);

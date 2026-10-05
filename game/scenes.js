@@ -27,7 +27,7 @@ export const SCENES = {
 
         props: [],
 
-        exits: {
+        navigation: {
             left: "bedWindow",
             right: "bedWall"
         }
@@ -43,7 +43,7 @@ export const SCENES = {
 
         props: [],
 
-        exits: {
+        navigation: {
             right: "bedWall"
         }
     },
@@ -61,7 +61,7 @@ export const SCENES = {
 
         props: [],
 
-        exits: {
+        navigation: {
             right: "bathroomEntrance"
         }
     }
