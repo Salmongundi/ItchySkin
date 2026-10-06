@@ -22,6 +22,11 @@ import {
     ceilingFan_003
 } from "./assets/ascii/environments/ceiling.js";
 
+import { 
+    pizzaSlice_001,
+    pizzaSlice_002
+} from "./assets/ascii/props/pizza.js";
+
 
 
 export const SCENES = {
@@ -131,7 +136,19 @@ export const SCENES = {
             frameDuration: 550
         },
 
-        props: [],
+        props: [
+            {
+                id: "pizza",
+                artwork: pizzaSlice_001,
+                column: 61,
+                row: 36,
+                scale: 0.35,
+                interaction: "eat",
+                foodAmount: 1,
+                initialState: "crumbs",
+                nextState: "eaten"
+            }
+        ],
 
         navigation: {
             down: "bathroomEntrance"

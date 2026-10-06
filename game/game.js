@@ -1,8 +1,11 @@
-import { SCENES } from "./scenes.js";
+import { startAsciiAnimation
+} from "../engine/ascii/effects/animation/asciiAnimation.js";
 
 import {
-    setCursor
-} from "./cursor.js";
+    resizeCanvas,
+    drawAscii,
+    drawAsciiAt
+} from "../engine/ascii/effects/visual/asciiRenderer.js";
 
 import {
     upCursor,
@@ -12,18 +15,17 @@ import {
     upRightCursor
 } from "./assets/ascii/cursors/arrows.js";
 
+import { setCursor } from "./cursor.js";
+import { interactWithProp } from "./interactions.js";
+
 import {
-    normalCursor
+    normalCursor,
+    interactionCursor
 } from "./assets/ascii/cursors/normal.js";
 
-import {
-    startAsciiAnimation
-} from "../engine/ascii/effects/animation/asciiAnimation.js";
+import { SCENES } from "./scenes.js";
+import { gameState } from "./state.js";
 
-import {
-    resizeCanvas,
-    drawAscii
-} from "../engine/ascii/effects/visual/asciiRenderer.js";
 
 
 // ==================================================
@@ -32,7 +34,7 @@ import {
 
 const DEV_MODE = true;
 
-const START_SCENE = "ceiling";
+const START_SCENE = "showerInterior";
 
 const NAVIGATION_EDGE_RATIO = 0.05;
 
@@ -57,7 +59,6 @@ let currentScene = null;
 let currentAnimation = null;
 
 let devCoordinateDisplay = null;
-
 
 // ==================================================
 // CANVAS
@@ -229,6 +230,48 @@ function navigate(direction) {
     loadScene(nextScene);
 }
 
+function getPropAt(mouseX, mouseY) {
+    if (!currentScene.props) {
+        return null;
+    }
+
+    const position = getArtworkPosition(mouseX, mouseY);
+
+    if (!position) {
+        return null;
+    }
+
+    for (const prop of currentScene.props) {
+        const propState =
+            gameState.props[prop.id]?.state ?? prop.initialState;
+
+        const artwork =
+            prop.artwork.states[propState];
+
+        const lines = artwork.split("\n");
+
+        const width = Math.max(
+            ...lines.map(line => line.length)
+        );
+
+        const height = lines.length;
+
+        const propWidth = width * prop.scale;
+        const propHeight = height * prop.scale;
+
+        if (
+            position.column >= prop.column &&
+            position.column < prop.column + propWidth &&
+            position.row >= prop.row &&
+            position.row < prop.row + propHeight
+        ) {
+            return prop;
+        }
+    }
+
+    return null;
+}
+
 
 // ==================================================
 // CURSOR
@@ -316,6 +359,16 @@ canvas.addEventListener("mousemove", (event) => {
         return;
     }
 
+    const prop = getPropAt(
+        event.offsetX,
+        event.offsetY
+    );
+
+    if (prop) {
+        setCursor(interactionCursor);
+        return;
+    }
+
     setCursor(normalCursor);
 });
 
@@ -350,7 +403,16 @@ canvas.addEventListener("click", (event) => {
             event.offsetY
         );
     }
-    });
+
+    const prop = getPropAt(
+        event.offsetX,
+        event.offsetY
+    );
+
+    if (prop) {
+        interactWithProp(prop);
+    }
+});
 
 
 // ==================================================
@@ -371,6 +433,23 @@ function render() {
         ctx,
         currentAnimation.frame
     );
+
+    for (const prop of currentScene.props ?? []) {
+        const propState =
+            gameState.props[prop.id]?.state ?? prop.initialState;
+
+        const artwork =
+            prop.artwork.states[propState];
+
+        drawAsciiAt(
+            ctx,
+            artwork,
+            prop.column,
+            prop.row,
+            prop.scale,
+            artworkGeometry
+        );
+    }
 
     requestAnimationFrame(render);
 }

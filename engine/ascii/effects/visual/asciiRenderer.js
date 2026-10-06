@@ -1,6 +1,12 @@
 const BASE_FONT_SIZE = 16;
 const FONT_FAMILY = "monospace";
 
+
+// ==================================================
+// CANVAS
+// ==================================================
+
+// Resize the canvas to fit the window, taking into account the device pixel ratio. */
 export function resizeCanvas(canvas) {
     const dpr = window.devicePixelRatio || 1;
 
@@ -11,17 +17,52 @@ export function resizeCanvas(canvas) {
     canvas.style.height = `${window.innerHeight}px`;
 }
 
+
+// ==================================================
+// ASCII
+// ==================================================
+
+function drawAsciiLines(
+    ctx,
+    lines,
+    column,
+    row,
+    geometry,
+    characterWidth = geometry.characterWidth,
+    characterHeight = geometry.characterHeight
+) {
+    for (let asciiRow = 0; asciiRow < lines.length; asciiRow++) {
+        const line = lines[asciiRow];
+
+        for (let asciiColumn = 0; asciiColumn < line.length; asciiColumn++) {
+            const character = line[asciiColumn];
+
+            if (character === " ") {
+                continue;
+            }
+
+            ctx.fillText(
+                character,
+
+                geometry.offsetX +
+                column * geometry.characterWidth +
+                asciiColumn * characterWidth,
+
+                geometry.offsetY +
+                row * geometry.characterHeight +
+                asciiRow * characterHeight
+            );
+        }
+    }
+}
+
+
+// ==================================================
+// ENVIRONMENT
+// ==================================================
+
 export function drawAscii(ctx, ascii) {
     const lines = ascii.split("\n");
-
-    // Remove the empty line created by the template literal.
-    while (lines.length && lines[0] === "") {
-        lines.shift();
-    }
-
-    while (lines.length && lines[lines.length - 1] === "") {
-        lines.pop();
-    }
 
     const maxColumns = Math.max(
         ...lines.map(line => line.length)
@@ -51,6 +92,16 @@ export function drawAscii(ctx, ascii) {
     const offsetX = (ctx.canvas.width - scaledWidth) / 2;
     const offsetY = (ctx.canvas.height - scaledHeight) / 2;
 
+    const geometry = {
+        offsetX,
+        offsetY,
+        scale,
+        characterWidth: scaledCharacterWidth,
+        characterHeight: scaledCharacterHeight,
+        width: scaledWidth,
+        height: scaledHeight
+    };
+
     ctx.clearRect(
         0,
         0,
@@ -63,33 +114,57 @@ export function drawAscii(ctx, ascii) {
     ctx.font = `${BASE_FONT_SIZE * scale}px ${FONT_FAMILY}`;
     ctx.textBaseline = "top";
 
-    for (let row = 0; row < lines.length; row++) {
-        const line = lines[row];
-
-        for (let column = 0; column < line.length; column++) {
-            const character = line[column];
-
-            if (character === " ") {
-                continue;
-            }
-
-            ctx.fillText(
-                character,
-                offsetX + column * scaledCharacterWidth,
-                offsetY + row * scaledCharacterHeight
-            );
-        }
-    }
+    drawAsciiLines(
+        ctx,
+        lines,
+        0,
+        0,
+        geometry
+    );
 
     ctx.restore();
 
-    return {
-        offsetX,
-        offsetY,
-        scale,
-        characterWidth: scaledCharacterWidth,
-        characterHeight: scaledCharacterHeight,
-        width: scaledWidth,
-        height: scaledHeight
-    };
+    return geometry;
+}
+
+
+// ==================================================
+// PROPS / OVERLAYS
+// ==================================================
+
+// Draw ASCII artwork at a specific position with scaling.
+export function drawAsciiAt(
+    ctx,
+    ascii,
+    column,
+    row,
+    scale,
+    geometry
+) {
+    const lines = ascii.split("\n");
+
+    const characterWidth =
+        geometry.characterWidth * scale;
+
+    const characterHeight =
+        geometry.characterHeight * scale;
+
+    ctx.save();
+
+    ctx.font =
+        `${BASE_FONT_SIZE * geometry.scale * scale}px ${FONT_FAMILY}`;
+
+    ctx.textBaseline = "top";
+
+    drawAsciiLines(
+        ctx,
+        lines,
+        column,
+        row,
+        geometry,
+        characterWidth,
+        characterHeight
+    );
+
+    ctx.restore();
 }
