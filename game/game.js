@@ -1,3 +1,5 @@
+// #region IMPORTS
+
 import { startAsciiAnimation
 } from "../engine/ascii/effects/animation/asciiAnimation.js";
 
@@ -16,28 +18,39 @@ import {
 } from "./assets/ascii/cursors/arrows.js";
 
 import { setCursor } from "./cursor.js";
+
+import {
+    createDevTools,
+    updateDevCoordinateDisplay
+} from "./devTools.js";
+
 import { interactWithProp } from "./interactions.js";
+
+import {
+    getEdgeNavigation,
+    getNavigationArea,
+    getNextScene
+} from "./navigation.js";
 
 import {
     normalCursor,
     interactionCursor
 } from "./assets/ascii/cursors/normal.js";
 
+import { getPropAt } from "./props.js";
 import { SCENES } from "./scenes.js";
-import { gameState } from "./state.js";
 
+import {
+    gameState,
+    getPropState
+} from "./state.js";
 
+// #endregion
 
-// ==================================================
-// CONSTANTS
-// ==================================================
-
-const DEV_MODE = true;
-
-const START_SCENE = "showerInterior";
+// #region CONSTANTS
 
 const NAVIGATION_EDGE_RATIO = 0.05;
-
+const START_SCENE = "showerInterior";
 const CURSORS = {
     up: upCursor,
     right: rightCursor,
@@ -46,10 +59,9 @@ const CURSORS = {
     upRight: upRightCursor
 };
 
+// #endregion
 
-// ==================================================
-// DOM / STATE
-// ==================================================
+// #region DOM / STATE
 
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
@@ -60,9 +72,9 @@ let currentAnimation = null;
 
 let devCoordinateDisplay = null;
 
-// ==================================================
-// CANVAS
-// ==================================================
+// #endregion
+
+// #region CANVAS
 
 resizeCanvas(canvas);
 
@@ -70,32 +82,9 @@ window.addEventListener("resize", () => {
     resizeCanvas(canvas);
 });
 
+// #endregion
 
-// ==================================================
-// DEVELOPER TOOLS
-// ==================================================
-
-function createDevTools() {
-    if (!DEV_MODE) {
-        return;
-    }
-
-    devCoordinateDisplay = document.createElement("div");
-
-    devCoordinateDisplay.style.position = "fixed";
-    devCoordinateDisplay.style.top = "10px";
-    devCoordinateDisplay.style.left = "10px";
-    devCoordinateDisplay.style.zIndex = "10000";
-    devCoordinateDisplay.style.fontFamily = "monospace";
-    devCoordinateDisplay.style.fontSize = "14px";
-    devCoordinateDisplay.style.color = "white";
-    devCoordinateDisplay.style.background = "black";
-    devCoordinateDisplay.style.padding = "4px 6px";
-    devCoordinateDisplay.style.pointerEvents = "none";
-
-    document.body.appendChild(devCoordinateDisplay);
-}
-
+// #region DEVELOPER TOOLS
 
 function getArtworkPosition(mouseX, mouseY) {
     if (!artworkGeometry) {
@@ -125,103 +114,16 @@ function getArtworkPosition(mouseX, mouseY) {
     };
 }
 
+// #endregion
 
-function updateDevCoordinateDisplay(position) {
-    if (!DEV_MODE || !devCoordinateDisplay) {
-        return;
-    }
-
-    if (!position) {
-        devCoordinateDisplay.textContent = "";
-        return;
-    }
-
-    devCoordinateDisplay.textContent =
-        `Column: ${position.column}  Row: ${position.row}`;
-}
-
-
-// ==================================================
-// NAVIGATION
-// ==================================================
-
-function getEdgeNavigation(mouseX, mouseY) {
-    const edgeWidth =
-        canvas.clientWidth * NAVIGATION_EDGE_RATIO;
-
-    const edgeHeight =
-        canvas.clientHeight * NAVIGATION_EDGE_RATIO;
-
-    const nearLeft =
-        mouseX < edgeWidth;
-
-    const nearRight =
-        mouseX > canvas.clientWidth - edgeWidth;
-
-    const nearTop =
-        mouseY < edgeHeight;
-
-    const nearBottom =
-        mouseY > canvas.clientHeight - edgeHeight;
-
-
-    // Corners are dead zones.
-    if (
-        (nearTop && nearLeft) ||
-        (nearTop && nearRight) ||
-        (nearBottom && nearLeft) ||
-        (nearBottom && nearRight)
-    ) {
-        return null;
-    }
-
-
-    if (nearTop) {
-        return "up";
-    }
-
-    if (nearRight) {
-        return "right";
-    }
-
-    if (nearBottom) {
-        return "down";
-    }
-
-    if (nearLeft) {
-        return "left";
-    }
-
-    return null;
-}
-
-function getNavigationArea(mouseX, mouseY) {
-    if (!currentScene.navigationAreas) {
-        return null;
-    }
-
-    const position = getArtworkPosition(mouseX, mouseY);
-
-    for (const navigationArea of currentScene.navigationAreas) {
-        const { column, row, width, height } =
-            navigationArea.area;
-
-        if (
-            position.column >= column &&
-            position.column < column + width &&
-            position.row >= row &&
-            position.row < row + height
-        ) {
-            return navigationArea;
-        }
-    }
-
-    return null;
-}
+// #region NAVIGATION
 
 function navigate(direction) {
     const nextScene =
-        currentScene.navigation?.[direction];
+        getNextScene(
+            currentScene,
+            direction
+        );
 
     if (!nextScene) {
         return;
@@ -230,56 +132,18 @@ function navigate(direction) {
     loadScene(nextScene);
 }
 
-function getPropAt(mouseX, mouseY) {
-    if (!currentScene.props) {
-        return null;
-    }
+// #endregion
 
-    const position = getArtworkPosition(mouseX, mouseY);
-
-    if (!position) {
-        return null;
-    }
-
-    for (const prop of currentScene.props) {
-        const propState =
-            gameState.props[prop.id]?.state ?? prop.initialState;
-
-        const artwork =
-            prop.artwork.states[propState];
-
-        const lines = artwork.split("\n");
-
-        const width = Math.max(
-            ...lines.map(line => line.length)
-        );
-
-        const height = lines.length;
-
-        const propWidth = width * prop.scale;
-        const propHeight = height * prop.scale;
-
-        if (
-            position.column >= prop.column &&
-            position.column < prop.column + propWidth &&
-            position.row >= prop.row &&
-            position.row < prop.row + propHeight
-        ) {
-            return prop;
-        }
-    }
-
-    return null;
-}
-
-
-// ==================================================
-// CURSOR
-// ==================================================
+// #region CURSOR
 
 function updateCursorState(mouseX, mouseY) {
     const direction =
-        getEdgeNavigation(mouseX, mouseY);
+        getEdgeNavigation(
+            mouseX,
+            mouseY,
+            canvas,
+            NAVIGATION_EDGE_RATIO
+        );
 
     if (!direction) {
         setCursor(normalCursor);
@@ -297,10 +161,9 @@ function updateCursorState(mouseX, mouseY) {
     setCursor(CURSORS[direction]);
 }
 
+// #endregion
 
-// ==================================================
-// SCENES
-// ==================================================
+// #region SCENES
 
 function loadScene(sceneId) {
     const scene = SCENES[sceneId];
@@ -321,22 +184,25 @@ function loadScene(sceneId) {
     );
 }
 
+// #endregion
 
-// ==================================================
-// MOUSE EVENTS
-// ==================================================
-
+// #region MOUSE EVENTS
 canvas.addEventListener("mousemove", (event) => {
+    const mouseX = event.offsetX;
+    const mouseY = event.offsetY;
+
     const position = getArtworkPosition(
-        event.offsetX,
-        event.offsetY
+        mouseX,
+        mouseY
     );
 
     updateDevCoordinateDisplay(position);
 
     const edgeDirection = getEdgeNavigation(
-        event.offsetX,
-        event.offsetY
+        mouseX,
+        mouseY,
+        canvas,
+        NAVIGATION_EDGE_RATIO
     );
 
     if (edgeDirection) {
@@ -350,8 +216,10 @@ canvas.addEventListener("mousemove", (event) => {
     }
 
     const navigationArea = getNavigationArea(
-        event.offsetX,
-        event.offsetY
+        mouseX,
+        mouseY,
+        currentScene,
+        getArtworkPosition
     );
 
     if (navigationArea) {
@@ -360,8 +228,10 @@ canvas.addEventListener("mousemove", (event) => {
     }
 
     const prop = getPropAt(
-        event.offsetX,
-        event.offsetY
+        mouseX,
+        mouseY,
+        currentScene,
+        getArtworkPosition
     );
 
     if (prop) {
@@ -374,39 +244,50 @@ canvas.addEventListener("mousemove", (event) => {
 
 
 canvas.addEventListener("click", (event) => {
+    const mouseX = event.offsetX;
+    const mouseY = event.offsetY;
+
     const direction = getEdgeNavigation(
-        event.offsetX,
-        event.offsetY
+        mouseX,
+        mouseY,
+        canvas,
+        NAVIGATION_EDGE_RATIO
     );
 
     if (direction) {
         navigate(direction);
 
         updateCursorState(
-            event.offsetX,
-            event.offsetY
+            mouseX,
+            mouseY
         );
 
         return;
     }
 
     const navigationArea = getNavigationArea(
-        event.offsetX,
-        event.offsetY
+        mouseX,
+        mouseY,
+        currentScene,
+        getArtworkPosition
     );
 
     if (navigationArea) {
         loadScene(navigationArea.destination);
 
         updateCursorState(
-            event.offsetX,
-            event.offsetY
+            mouseX,
+            mouseY
         );
+
+        return;
     }
 
     const prop = getPropAt(
-        event.offsetX,
-        event.offsetY
+        mouseX,
+        mouseY,
+        currentScene,
+        getArtworkPosition
     );
 
     if (prop) {
@@ -414,19 +295,17 @@ canvas.addEventListener("click", (event) => {
     }
 });
 
+// #endregion
 
-// ==================================================
-// START GAME
-// ==================================================
+// #region START GAME
 
 createDevTools();
 
 loadScene(START_SCENE);
 
+// #endregion
 
-// ==================================================
-// RENDER
-// ==================================================
+// #region RENDER
 
 function render() {
     artworkGeometry = drawAscii(
@@ -435,8 +314,7 @@ function render() {
     );
 
     for (const prop of currentScene.props ?? []) {
-        const propState =
-            gameState.props[prop.id]?.state ?? prop.initialState;
+        const propState = getPropState(prop);
 
         const artwork =
             prop.artwork.states[propState];
@@ -455,3 +333,7 @@ function render() {
 }
 
 render();
+
+// #endregion
+
+

@@ -3,3 +3,7 @@ export const gameState = {
 
     props: {}
 };
+
+export function getPropState(prop) {
+    return gameState.props[prop.id]?.state ?? prop.initialState;
+}

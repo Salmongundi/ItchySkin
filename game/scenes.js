@@ -145,7 +145,7 @@ export const SCENES = {
                 scale: 0.35,
                 interaction: "eat",
                 foodAmount: 1,
-                initialState: "crumbs",
+                initialState: "whole",
                 nextState: "eaten"
             }
         ],
