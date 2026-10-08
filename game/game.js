@@ -14,7 +14,10 @@ import {
     rightCursor,
     downCursor,
     leftCursor,
-    upRightCursor
+    upRightCursor,
+    upLeftCursor,
+    downRightCursor,
+    downLeftCursor
 } from "./assets/ascii/cursors/arrows.js";
 
 import { setCursor } from "./cursor.js";
@@ -50,13 +53,16 @@ import {
 // #region CONSTANTS
 
 const NAVIGATION_EDGE_RATIO = 0.05;
-const START_SCENE = "showerInterior";
+const START_SCENE = "livingRoomNorth";
 const CURSORS = {
     up: upCursor,
     right: rightCursor,
     down: downCursor,
     left: leftCursor,
-    upRight: upRightCursor
+    upRight: upRightCursor,
+    upLeft: upLeftCursor,
+    downRight: downRightCursor,
+    downLeft: downLeftCursor
 };
 
 // #endregion
