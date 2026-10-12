@@ -21,7 +21,7 @@ export function getPropAt(
         const propState = getPropState(prop);
 
         const artwork =
-            prop.artwork.states[propState];
+            prop.definition.artwork.states[propState];
 
         const lines = artwork.split("\n");
 

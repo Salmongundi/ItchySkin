@@ -27,6 +27,11 @@ import {
     updateDevCoordinateDisplay
 } from "./devTools.js";
 
+import {
+    advanceMessage,
+    isMessageOpen
+} from "./dialogue.js";
+
 import { interactWithProp } from "./interactions.js";
 
 import {
@@ -41,7 +46,7 @@ import {
 } from "./assets/ascii/cursors/normal.js";
 
 import { getPropAt } from "./props.js";
-import { SCENES } from "./scenes.js";
+import { SCENES } from "./scenes/index.js";
 
 import {
     gameState,
@@ -53,7 +58,7 @@ import {
 // #region CONSTANTS
 
 const NAVIGATION_EDGE_RATIO = 0.05;
-const START_SCENE = "livingRoomNorth";
+const START_SCENE = "showerInterior";
 const CURSORS = {
     up: upCursor,
     right: rightCursor,
@@ -250,6 +255,11 @@ canvas.addEventListener("mousemove", (event) => {
 
 
 canvas.addEventListener("click", (event) => {
+    if (isMessageOpen()) {
+            advanceMessage();
+            return;
+    }
+
     const mouseX = event.offsetX;
     const mouseY = event.offsetY;
 
@@ -321,9 +331,13 @@ function render() {
 
     for (const prop of currentScene.props ?? []) {
         const propState = getPropState(prop);
+        const artwork = prop.definition.artwork.states[propState];
 
-        const artwork =
-            prop.artwork.states[propState];
+ if (prop.id === "pizza") {
+    console.log("State:", propState);
+    console.log("Available states:", Object.keys(prop.definition.artwork.states));
+    console.log("Resolved artwork:", artwork);
+}
 
         drawAsciiAt(
             ctx,

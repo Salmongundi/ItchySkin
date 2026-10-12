@@ -16,3 +16,46 @@ body {
     width: 100%;
     height: 100%;
 }
+
+/* DIALOGUE */
+
+.dialogue-box {
+    position: fixed;
+    z-index: 10;
+    left: 5%;
+    bottom: 4%;
+    width: 90%;
+    max-height: 30%;
+    box-sizing: border-box;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 1rem;
+
+    padding: 1.25rem;
+    border: 2px solid black;
+    background: rgba(255, 255, 255, 0.97);
+
+    font-family: serif;
+    font-size: clamp(1rem, 2vw, 1.4rem);
+    line-height: 1.5;
+
+    /* Clicks pass through to the canvas. */
+    pointer-events: none;
+}
+
+.dialogue-box[hidden] {
+    display: none;
+}
+
+.dialogue-text {
+    margin: 0;
+    overflow-wrap: anywhere;
+    white-space: pre-line;
+}
+
+.dialogue-hint {
+    align-self: flex-end;
+    font-size: 0.75em;
+}

@@ -111,6 +111,9 @@ export function drawAscii(ctx, ascii) {
 
     ctx.save();
 
+    // Set the fill style to white for drawing ASCII characters
+    //ctx.fillStyle = "#ffb000";
+
     ctx.font = `${BASE_FONT_SIZE * scale}px ${FONT_FAMILY}`;
     ctx.textBaseline = "top";
 

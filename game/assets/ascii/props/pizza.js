@@ -86,45 +86,56 @@ export const pizzaSlice_001 = {
                                         
                                         
 
-`,
-                                        
-                                        
+`
     }
 };
 
-export const pizzaSlice_002 = {
-    artwork: `
-        ;                               
-         &&                             
-         &    &&                        
-       X&      &&&&&&                   
-       &&       &&&&&&&&&&              
-        &&&&&&      &&&&&&&&&           
-         & &&&&&+         &&&&&&        
-            &&&&&&&&          &&&       
-        &    &&&&&&&&&         &&&      
-       X &&    &&&&&&&&&        &&&     
-       &&&&&&&   &&&&&&&         &&&    
-      &&&&&&&&&   :&&&&&&&      &&&&&&  
-     && &&&&&&       &&&&&&&&&&&&&&&&&& 
-    X&&    &$          &&&&&&& &&&&&&&& 
-    X&                    &&&&&&&&&&&&  
-    &&          &   &     &&&&&&&&&&&&  
-    &&        &&&+ &&&&  &  &&&&&&&&    
-   &&&&       &&&&&&&&&  &              
-    &&&       &&&&&&&&& &&              
-   &&&&         x&&&&   &               
-   &&&&               &&&               
-   &&&&&&           &&&                 
-   &&&&&&&        &&&                   
-  &&&&&&      &&&&&                     
-  &&&&    :&&&&&&:                      
-  &&&&&&&&&&&&&                         
- &&&&&&&&&&                             
-    ..                                  
-                                        
 
-`
+
+
+export const pizzaDefinition = {
+    artwork: pizzaSlice_001,
+    initialState: "whole",
+
+    onClick: [
+        {
+            conditions: [
+                {
+                    type: "propStateIs",
+                    state: "whole"
+                }
+            ],
+
+            effects: [
+                {
+                    type: "setPropState",
+                    state: "eaten"
+                },
+                {
+                    type: "showMessage",
+                    pages: [
+                        "You take a bite out of the plastic pizza. \nIt's not nearly as filling as you hoped it would be."
+                    ]
+                }
+            ]
+        },
+
+        {
+            conditions: [
+                {
+                    type: "propStateIs",
+                    state: "eaten"
+                }
+            ],
+
+            effects: [
+                {
+                    type: "showMessage",
+                    pages: [
+                        "You take another bite of the plastic in the exact same place as before. \nSurprisingly, it looks exactly the same."
+                    ]
+                }
+            ]
+        }
+    ]
 };
-
-
