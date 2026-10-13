@@ -30,6 +30,10 @@ import {
     mouseHoleEntrance_003
 } from "../assets/ascii/environments/livingRoom.js";
 
+import {
+    drillDefinition
+} from "../assets/ascii/props/powerDrill.js";
+
 // #endregion
 
 // #region SCENES
@@ -232,7 +236,15 @@ export const livingRoomScenes = {
             frameDuration: 550
         },
 
-        props: [],
+        props: [
+                    {
+                        id: "drill",
+                        definition: drillDefinition,
+                        column: 53,
+                        row: 14,
+                        scale: 0.25
+                    }
+                ],
 
         navigation: {
             down: "livingRoomNorth"

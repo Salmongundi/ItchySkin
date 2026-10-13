@@ -4,6 +4,8 @@ export const gameState = {
         foodEaten: 0
     },
 
+    inventory: [],
+
     props: {}
 };
 

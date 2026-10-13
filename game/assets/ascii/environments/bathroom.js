@@ -1,3 +1,5 @@
+//#region Bathroom Entrance
+
 export const bathroomEntrance_001 = `
   . :   . -  -     -       .    -@                                                 @:                                                                 
 :  . .   . :  -  .    ......::...@      @@@@@.                                     @:                           %@*@@@+-.                             
@@ -168,6 +170,10 @@ export const bathroomEntrance_003 = `
 9999999667112699995208       04   706                             0                                                                                   
 566266603 007566690       807   007                               0                                                                                   
 `;
+
+//#endregion
+
+//#region Shower Interior
 
 export const showerInterior_001 = `
                                                                                                     
@@ -421,6 +427,10 @@ export const showerInterior_003 = `
           3                            00  1                         0                              
 `;
 
+//#endregion
+
+//#region Bathroom Interior Left
+
 export const bathroomInteriorLeft_001 = `           @@                                                                                                @@=                                      
            @@                                                                                                @@+                                      
            @@-                                                                                               @@                                       
@@ -617,6 +627,9 @@ export const bathroomInteriorLeft_003 = `           99                          
           899                                                                                                 599     999               999   999     
           999                                                                                                 599     09990              0999  7993   `;
 
+//#endregion
+
+//#region Bathroom Exit
 
 export const bathroomExit_001 = `
                                                                                                                                                       
@@ -819,6 +832,7 @@ export const bathroomExit_003 = `
                                                                                                                                                       
 `;
 
+//#endregion
 
 //#region bathroomDrywallPanel
 export const bathroomDrywallPanel_001 = `                                                                                                                                                      
@@ -989,4 +1003,72 @@ export const bathroomDrywallPanel_003 = `
                                                                   1261                               155999991                                        
                                                                      0320                                                                             
                                                                                                                                                       `;
+//#endregion
+
+//#region emptyBackground
+
+export const emptyBackground_001 = `                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      
+                                                                                                                                                      `;
+
 //#endregion

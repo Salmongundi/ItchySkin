@@ -35,6 +35,15 @@ import {
 import { interactWithProp } from "./interactions.js";
 
 import {
+    drawInventoryUI,
+    isInventoryLabelAt,
+    isInventoryPanelAt,
+    toggleInventory,
+    isInventoryOpen,
+    closeInventory
+} from "./inventoryUI.js";
+
+import {
     getEdgeNavigation,
     getNavigationArea,
     getNextScene
@@ -44,6 +53,11 @@ import {
     normalCursor,
     interactionCursor
 } from "./assets/ascii/cursors/normal.js";
+
+import {
+    getCurrentPalette,
+    cyclePalette
+} from "./palette.js";
 
 import { getPropAt } from "./props.js";
 import { SCENES } from "./scenes/index.js";
@@ -58,7 +72,7 @@ import {
 // #region CONSTANTS
 
 const NAVIGATION_EDGE_RATIO = 0.05;
-const START_SCENE = "showerInterior";
+const START_SCENE = "bathroomInteriorLeft";
 const CURSORS = {
     up: upCursor,
     right: rightCursor,
@@ -127,6 +141,78 @@ function getArtworkPosition(mouseX, mouseY) {
 
 // #endregion
 
+
+ // #region PALETTE CONTROL
+
+const PALETTE_ART = [
+    "┏━┓",
+    "┗━┛"
+].join("\n");
+
+const PALETTE_LINES = PALETTE_ART.split("\n");
+const PALETTE_WIDTH = Math.max(...PALETTE_LINES.map(line => line.length));
+const PALETTE_HEIGHT = PALETTE_LINES.length;
+
+function getPalettePosition() {
+    const { offsetX, offsetY, characterWidth, characterHeight } =
+        artworkGeometry;
+
+    return {
+        column: Math.ceil(-offsetX / characterWidth),
+        row: Math.floor(
+            (canvas.height - offsetY) / characterHeight
+        ) - PALETTE_HEIGHT
+    };
+}
+
+function isPaletteControlAt(position) {
+    if (!position || !artworkGeometry) {
+        return false;
+    }
+
+    const { column, row } = getPalettePosition();
+
+    return (
+        position.column >= column &&
+        position.column < column + PALETTE_WIDTH &&
+        position.row >= row &&
+        position.row < row + PALETTE_HEIGHT
+    );
+}
+
+function drawPaletteControl() {
+    if (!artworkGeometry) {
+        return;
+    }
+
+    const palette = getCurrentPalette();
+    const { column, row } = getPalettePosition();
+    const { offsetX, offsetY, characterWidth, characterHeight } =
+        artworkGeometry;
+
+    ctx.fillStyle = palette.background;
+    ctx.fillRect(
+        offsetX + column * characterWidth,
+        offsetY + row * characterHeight,
+        PALETTE_WIDTH * characterWidth,
+        PALETTE_HEIGHT * characterHeight
+    );
+
+    ctx.fillStyle = palette.foreground;
+
+    drawAsciiAt(
+        ctx,
+        PALETTE_ART,
+        column,
+        row,
+        1,
+        artworkGeometry
+    );
+}
+
+// #endregion
+
+
 // #region NAVIGATION
 
 function navigate(direction) {
@@ -183,7 +269,12 @@ function loadScene(sceneId) {
         throw new Error(`Scene not found: ${sceneId}`);
     }
 
-    currentScene = scene;
+    currentScene = {
+        ...scene,
+        props: (scene.props ?? []).filter(
+            prop => !gameState.props[prop.id]?.pickedUp
+        )
+    };
 
     currentAnimation?.stop();
 
@@ -198,6 +289,7 @@ function loadScene(sceneId) {
 // #endregion
 
 // #region MOUSE EVENTS
+
 canvas.addEventListener("mousemove", (event) => {
     const mouseX = event.offsetX;
     const mouseY = event.offsetY;
@@ -208,6 +300,14 @@ canvas.addEventListener("mousemove", (event) => {
     );
 
     updateDevCoordinateDisplay(position);
+
+    if (
+        isInventoryLabelAt(position, artworkGeometry) ||
+        isInventoryPanelAt(position, artworkGeometry)
+    ) {
+        setCursor(interactionCursor);
+        return;
+    }
 
     const edgeDirection = getEdgeNavigation(
         mouseX,
@@ -256,12 +356,39 @@ canvas.addEventListener("mousemove", (event) => {
 
 canvas.addEventListener("click", (event) => {
     if (isMessageOpen()) {
-            advanceMessage();
-            return;
+        advanceMessage();
+        return;
     }
 
     const mouseX = event.offsetX;
     const mouseY = event.offsetY;
+
+    const position = getArtworkPosition(
+        mouseX,
+        mouseY
+    );
+
+    // Cycle palette when its control is clicked.
+    if (isPaletteControlAt(position)) {
+        cyclePalette();
+        return;
+    }
+
+    // Toggle inventory from its label.
+    if (isInventoryLabelAt(position, artworkGeometry)) {
+        toggleInventory();
+        return;
+    }
+
+    // Clicking inside the open panel does nothing.
+    if (isInventoryPanelAt(position, artworkGeometry)) {
+        return;
+    }
+
+    // Close inventory, then continue processing the room click.
+    if (isInventoryOpen()) {
+        closeInventory();
+    }
 
     const direction = getEdgeNavigation(
         mouseX,
@@ -308,6 +435,10 @@ canvas.addEventListener("click", (event) => {
 
     if (prop) {
         interactWithProp(prop);
+
+        currentScene.props = currentScene.props.filter(
+            item => !gameState.props[item.id]?.pickedUp
+        );
     }
 });
 
@@ -324,6 +455,10 @@ loadScene(START_SCENE);
 // #region RENDER
 
 function render() {
+    const palette = getCurrentPalette();
+
+    ctx.fillStyle = palette.foreground;
+
     artworkGeometry = drawAscii(
         ctx,
         currentAnimation.frame
@@ -331,13 +466,8 @@ function render() {
 
     for (const prop of currentScene.props ?? []) {
         const propState = getPropState(prop);
-        const artwork = prop.definition.artwork.states[propState];
-
- if (prop.id === "pizza") {
-    console.log("State:", propState);
-    console.log("Available states:", Object.keys(prop.definition.artwork.states));
-    console.log("Resolved artwork:", artwork);
-}
+        const artwork =
+            prop.definition.artwork.states[propState];
 
         drawAsciiAt(
             ctx,
@@ -349,11 +479,13 @@ function render() {
         );
     }
 
+    drawInventoryUI(ctx, artworkGeometry);
+    drawPaletteControl();
+
     requestAnimationFrame(render);
 }
 
-render();
-
 // #endregion
 
+render();
 

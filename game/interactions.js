@@ -1,22 +1,27 @@
+
 import { gameState, getPropState } from "./state.js";
 import { showMessage } from "./dialogue.js";
+import {
+    addItem,
+    removeItem as removeInventoryItem,
+    hasItem
+} from "./inventory.js";
 
 // #region CONDITIONS
 
-// This file defines the logic for handling interactions with game props, including conditions and effects.
-
-// CONDITION_HANDLERS maps condition types to their respective handler functions.
 const CONDITION_HANDLERS = {
     propStateIs({ prop, condition }) {
         return getPropState(prop) === condition.state;
+    },
+
+    hasItem({ condition }) {
+        return hasItem(condition.itemId);
     }
 };
 
-// conditionsPass checks if all conditions for a given prop are satisfied.
 function conditionsPass(prop, conditions) {
     for (const condition of conditions) {
-        const handler =
-            CONDITION_HANDLERS[condition.type];
+        const handler = CONDITION_HANDLERS[condition.type];
 
         if (!handler) {
             console.warn(
@@ -37,7 +42,6 @@ function conditionsPass(prop, conditions) {
 
 // #region EFFECTS
 
-// EFFECT_HANDLERS maps effect types to their respective handler functions.
 const EFFECT_HANDLERS = {
     incrementFact({ effect }) {
         const currentValue =
@@ -56,6 +60,32 @@ const EFFECT_HANDLERS = {
 
     showMessage({ effect }) {
         showMessage(effect.pages);
+    },
+
+    pickUpItem({ prop }) {
+        const item = prop.definition.inventoryItem;
+
+        if (!item) {
+            console.warn(
+                `Prop "${prop.id}" has no inventory item definition.`
+            );
+            return;
+        }
+
+        addItem(item);
+
+        gameState.props[prop.id] = {
+            ...gameState.props[prop.id],
+            pickedUp: true
+        };
+    },
+
+    addItem({ effect }) {
+        addItem(effect.item);
+    },
+
+    removeItem({ effect }) {
+        removeInventoryItem(effect.itemId);
     }
 };
 
@@ -63,7 +93,6 @@ const EFFECT_HANDLERS = {
 
 // #region INTERACTIONS
 
-// interactWithProp handles the interaction logic when a prop is clicked, including checking conditions and applying effects.
 export function interactWithProp(prop) {
     const onClick = prop.definition.onClick;
 
@@ -71,7 +100,6 @@ export function interactWithProp(prop) {
         return;
     }
 
-    // Support both a single interaction and a list.
     const interactions = Array.isArray(onClick)
         ? onClick
         : [onClick];
@@ -96,7 +124,6 @@ export function interactWithProp(prop) {
             handler({ prop, effect });
         }
 
-        // Only the first matching interaction runs.
         return;
     }
 }

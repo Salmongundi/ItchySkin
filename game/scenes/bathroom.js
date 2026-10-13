@@ -1,6 +1,7 @@
 // #region IMPORTS
 
 import {
+    emptyBackground_001,
     bathroomEntrance_001,
     bathroomEntrance_002,
     bathroomEntrance_003,
@@ -17,6 +18,11 @@ import {
     bathroomDrywallPanel_002,
     bathroomDrywallPanel_003
 } from "../assets/ascii/environments/bathroom.js";
+
+import {
+        batterBowlSideDefinition,
+        batterBowlZoomDefinition
+} from "../assets/ascii/props/batterBowl.js";
 
 
 import { 
@@ -146,8 +152,6 @@ export const bathroomScenes = {
             frameDuration: 1000
         },
 
-        props: [],
-
         navigation: {
             down: "bathroomExit",
             left: "bathroomExit",
@@ -166,6 +170,19 @@ export const bathroomScenes = {
                 },
 
                 cursor: "up"
+            },
+            
+            {
+                destination: "bathroomBatterBowlZoomedIn",
+
+                area: {
+                    column: 41,
+                    row: 32,
+                    width: 19,
+                    height: 5
+                },
+
+                cursor: "down"
             }
         ]
     },
@@ -182,6 +199,29 @@ export const bathroomScenes = {
         },
 
         props: [],
+
+        navigation: {
+            down: "bathroomInteriorLeft"
+        }
+    },
+
+    bathroomBatterBowlZoomedIn: {
+        animation: {
+            frames: [
+                emptyBackground_001
+            ],
+            frameDuration: 550
+        },
+
+        props: [
+        {
+            id: "batterBowlZoom",
+            definition: batterBowlZoomDefinition,
+            column: 0,
+            row: 0,
+            scale: 1
+        }
+    ],
 
         navigation: {
             down: "bathroomInteriorLeft"

@@ -1,3 +1,9 @@
+
+:root {
+    --game-background: #ffffff;
+    --game-foreground: #000000;
+}
+
 html,
 body {
     margin: 0;
@@ -6,8 +12,8 @@ body {
 }
 
 body {
-    color: black;
-    background: white;
+    color: var(--game-foreground);
+    background: var(--game-background);
     font-family: serif;
 }
 
@@ -15,6 +21,7 @@ body {
     display: block;
     width: 100%;
     height: 100%;
+    background: var(--game-background);
 }
 
 /* DIALOGUE */
@@ -34,14 +41,14 @@ body {
     gap: 1rem;
 
     padding: 1.25rem;
-    border: 2px solid black;
-    background: rgba(255, 255, 255, 0.97);
+    border: 2px solid var(--game-foreground);
+    background: var(--game-background);
 
+    color: var(--game-foreground);
     font-family: serif;
     font-size: clamp(1rem, 2vw, 1.4rem);
     line-height: 1.5;
 
-    /* Clicks pass through to the canvas. */
     pointer-events: none;
 }
 
