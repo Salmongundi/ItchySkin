@@ -1005,7 +1005,9 @@ export const bathroomDrywallPanel_003 = `
                                                                                                                                                       `;
 //#endregion
 
-//#region emptyBackground
+
+
+// MARK: Empty Background
 
 export const emptyBackground_001 = `                                                                                                                                                      
                                                                                                                                                       
@@ -1070,5 +1072,3 @@ export const emptyBackground_001 = `
                                                                                                                                                       
                                                                                                                                                       
                                                                                                                                                       `;
-
-//#endregion

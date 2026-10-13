@@ -1,4 +1,41 @@
-import { getPropState } from "./state.js";
+
+import {
+    getPropState,
+    getPropTalking
+} from "./state.js";
+
+// Get the current artwork frame for a prop.
+export function getPropArtwork(prop, time = performance.now()) {
+    const state = getPropState(prop);
+    const artwork = prop.definition.artwork.states[state];
+
+    let frames = artwork;
+
+    // Character artwork can have separate idle and talking frames.
+    if (artwork && typeof artwork === "object" && !Array.isArray(artwork)) {
+        frames = getPropTalking(prop)
+            ? artwork.talking
+            : artwork.idle;
+    }
+
+    // A single string is treated as a one-frame animation.
+    if (typeof frames === "string") {
+        return frames;
+    }
+
+    if (!Array.isArray(frames) || frames.length === 0) {
+        console.warn(`No artwork frames available for prop "${prop.id}".`);
+        return "";
+    }
+
+    const frameDuration =
+        prop.definition.animation?.frameDuration ?? 300;
+
+    const frameIndex =
+        Math.floor(time / frameDuration) % frames.length;
+
+    return frames[frameIndex];
+}
 
 export function getPropAt(
     mouseX,
@@ -10,19 +47,14 @@ export function getPropAt(
         return null;
     }
 
-    const position =
-        getArtworkPosition(mouseX, mouseY);
+    const position = getArtworkPosition(mouseX, mouseY);
 
     if (!position) {
         return null;
     }
 
     for (const prop of currentScene.props) {
-        const propState = getPropState(prop);
-
-        const artwork =
-            prop.definition.artwork.states[propState];
-
+        const artwork = getPropArtwork(prop);
         const lines = artwork.split("\n");
 
         const width = Math.max(

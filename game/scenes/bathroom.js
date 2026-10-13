@@ -31,9 +31,16 @@ import {
 
 // #endregion
 
+
+
+
 // #region SCENES
+
+
 export const bathroomScenes = {
 
+
+    // MARK: Bathroom Entrance
     bathroomEntrance: {
         animation: {
             frames: [
@@ -69,6 +76,7 @@ export const bathroomScenes = {
         ]
     },
 
+    //MARK: Shower Interior
     showerInterior: {
         animation: {
             frames: [
@@ -95,6 +103,7 @@ export const bathroomScenes = {
         }
     },
 
+    // MARK: Bathroom Exit
     bathroomExit: {
         animation: {
             frames: [
@@ -116,7 +125,7 @@ export const bathroomScenes = {
 
         navigationAreas: [
             {
-                destination: "underBed",
+                destination: "bedTop",
 
                 area: {
                     column: 36,
@@ -143,6 +152,7 @@ export const bathroomScenes = {
         ]
     },
 
+    // MARK: Bathroom Interior Left
     bathroomInteriorLeft: {
         animation: {
             frames: [
@@ -187,6 +197,7 @@ export const bathroomScenes = {
         ]
     },
 
+    // MARK: Bathroom Drywall Panel
     bathroomDrywallPanel: {
         animation: {
             frames: [
@@ -205,6 +216,7 @@ export const bathroomScenes = {
         }
     },
 
+    // MARK: Bathroom Batter Bowl Zoomed In
     bathroomBatterBowlZoomedIn: {
         animation: {
             frames: [

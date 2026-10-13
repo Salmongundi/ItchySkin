@@ -1,3 +1,5 @@
+
+
 // #region IMPORTS
 
 import { startAsciiAnimation
@@ -29,7 +31,8 @@ import {
 
 import {
     advanceMessage,
-    isMessageOpen
+    isMessageOpen,
+    showMessage
 } from "./dialogue.js";
 
 import { interactWithProp } from "./interactions.js";
@@ -59,20 +62,28 @@ import {
     cyclePalette
 } from "./palette.js";
 
-import { getPropAt } from "./props.js";
+import { checkDrillAssembly } from "./quests.js";
+
+import {
+    getPropAt,
+    getPropArtwork
+} from "./props.js";
+
 import { SCENES } from "./scenes/index.js";
 
 import {
-    gameState,
-    getPropState
+    gameState
 } from "./state.js";
 
 // #endregion
 
+
+
+
 // #region CONSTANTS
 
 const NAVIGATION_EDGE_RATIO = 0.05;
-const START_SCENE = "bathroomInteriorLeft";
+const START_SCENE = "jerboaTent";
 const CURSORS = {
     up: upCursor,
     right: rightCursor,
@@ -357,6 +368,15 @@ canvas.addEventListener("mousemove", (event) => {
 canvas.addEventListener("click", (event) => {
     if (isMessageOpen()) {
         advanceMessage();
+
+        if (!isMessageOpen()) {
+            const questMessage = checkDrillAssembly();
+
+            if (questMessage) {
+                showMessage(questMessage);
+            }
+        }
+
         return;
     }
 
@@ -442,6 +462,7 @@ canvas.addEventListener("click", (event) => {
     }
 });
 
+
 // #endregion
 
 // #region START GAME
@@ -465,9 +486,7 @@ function render() {
     );
 
     for (const prop of currentScene.props ?? []) {
-        const propState = getPropState(prop);
-        const artwork =
-            prop.definition.artwork.states[propState];
+        const artwork = getPropArtwork(prop);
 
         drawAsciiAt(
             ctx,

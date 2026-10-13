@@ -1,21 +1,19 @@
 // #region IMPORTS
 
+
 import {
+    bedTop_001,
+    bedTop_002,
+    bedTop_003,
     bedWall_001,
     bedWall_002,
-    bedWall_003
-} from "../assets/ascii/environments/bedWall.js";
-
-import {
-    bedWindow_001
-} from "../assets/ascii/environments/bedWindow.js";
-
-import {
+    bedWall_003,
+    bedWindow_001,
+    bedWindow_002,
+    bedWindow_003,
     ceilingFan_001,
-    ceilingFan_003
-} from "../assets/ascii/environments/ceiling.js";
-
-import {
+    ceilingFan_003,
+    jerboaTent_001,
     livingRoomNorth_001,
     livingRoomNorth_002,
     livingRoomNorth_003,
@@ -34,11 +32,22 @@ import {
     drillDefinition
 } from "../assets/ascii/props/powerDrill.js";
 
+import {
+    jerboaDefinition
+} from "../assets/ascii/props/jerboa.js";
+
+
 // #endregion
 
+
+
+
 // #region SCENES
+
+
 export const livingRoomScenes = {
 
+    // MARK: Ceiling
     ceiling: {
         animation: {
             frames: [
@@ -56,10 +65,15 @@ export const livingRoomScenes = {
         }
     },
 
+
+    // MARK: Bed Window
     bedWindow: {
         animation: {
             frames: [
-                bedWindow_001
+                bedWindow_001,
+                bedWindow_002,
+                bedWindow_003,
+                bedWindow_002
             ],
             frameDuration: 1000
         },
@@ -71,6 +85,8 @@ export const livingRoomScenes = {
         }
     },
 
+
+    // MARK: Bed Wall
     bedWall: {
         animation: {
             frames: [
@@ -83,6 +99,10 @@ export const livingRoomScenes = {
         },
 
         props: [],
+
+        navigation: {
+            right: "bedTop"
+        },
 
         navigationAreas: [
             {
@@ -100,6 +120,8 @@ export const livingRoomScenes = {
         ]
     },
 
+
+    // MARK: Under Bed
     underBed: {
         animation: {
             frames: [
@@ -133,6 +155,68 @@ export const livingRoomScenes = {
         ]
     },
 
+
+    // MARK: Bed Top
+    bedTop: {
+        animation: {
+            frames: [
+                bedTop_001,
+                bedTop_002,
+                bedTop_003,
+                bedTop_002
+            ],
+            frameDuration: 550
+        },
+
+        props: [],
+
+        navigation: {
+            down: "bathroomExit",
+            left: "bedWall"
+        },
+
+        navigationAreas: [
+            {
+                destination: "jerboaTent",
+
+                area: {
+                    column: 78,
+                    row: 14,
+                    width: 33,
+                    height: 18
+                },
+
+                cursor: "downLeft"
+            }
+        ]
+    },
+
+    // MARK: Jerboa Tent
+    jerboaTent: {
+        animation: {
+            frames: [
+                jerboaTent_001
+            ],
+            frameDuration: 550
+        },
+
+        props: [
+            {
+                id: "jerboa",
+                definition: jerboaDefinition,
+                column: 25,
+                row: 1,
+                scale: 1
+            }
+        ],
+
+        navigation: {
+            down: "bedTop"
+        }
+    },
+
+
+    // MARK: Living Room North
     livingRoomNorth: {
         animation: {
             frames: [
@@ -192,6 +276,8 @@ export const livingRoomScenes = {
         ]
     },
 
+
+    // MARK: Exit Door
     exitDoor: {
         animation: {
             frames: [
@@ -225,6 +311,8 @@ export const livingRoomScenes = {
         ]
     },
 
+
+    // MARK: Fridge Interior
     fridgeInterior: {
         animation: {
             frames: [
@@ -266,6 +354,8 @@ export const livingRoomScenes = {
         ]
     },
 
+
+    // MARK: Mouse Hole Entrance
     mouseHoleEntrance: {
         animation: {
             frames: [
