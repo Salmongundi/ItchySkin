@@ -49,11 +49,38 @@ body {
     font-size: clamp(1rem, 2vw, 1.4rem);
     line-height: 1.5;
 
-    pointer-events: none;
+    pointer-events: auto;
 }
 
 .dialogue-box[hidden] {
     display: none;
+}
+
+.dialogue-choices {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+}
+
+.dialogue-choices[hidden] {
+    display: none;
+}
+
+.dialogue-choice {
+    max-width: 100%;
+    padding: 0.4rem 0;
+    border: none;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.dialogue-choice:hover,
+.dialogue-choice:focus-visible {
+    text-decoration: underline;
 }
 
 .dialogue-text {

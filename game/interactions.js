@@ -1,6 +1,6 @@
 
 import { gameState, getPropState } from "./state.js";
-import { showMessage } from "./dialogue.js";
+import { showMessage, showMenu } from "./dialogue.js";
 import {
     addItem,
     removeItem as removeInventoryItem,
@@ -19,14 +19,12 @@ const CONDITION_HANDLERS = {
     }
 };
 
-function conditionsPass(prop, conditions) {
+function conditionsPass(prop, conditions = []) {
     for (const condition of conditions) {
         const handler = CONDITION_HANDLERS[condition.type];
 
         if (!handler) {
-            console.warn(
-                `Unknown condition type: ${condition.type}`
-            );
+            console.warn(`Unknown condition type: ${condition.type}`);
             return false;
         }
 
@@ -42,10 +40,40 @@ function conditionsPass(prop, conditions) {
 
 // #region EFFECTS
 
+function runEffects(prop, effects = []) {
+    for (const effect of effects) {
+        const handler = EFFECT_HANDLERS[effect.type];
+
+        if (!handler) {
+            console.warn(`Unknown effect type: ${effect.type}`);
+            continue;
+        }
+
+        handler({ prop, effect });
+    }
+}
+
+function openMenu(prop, effect) {
+    const choices = effect.choices.filter(choice =>
+        conditionsPass(prop, choice.conditions)
+    );
+
+    showMenu(choices, choice => {
+        showMessage(choice.pages, null, {
+            onComplete() {
+                runEffects(prop, choice.effects);
+
+                if (choice.returnToMenu !== false) {
+                    openMenu(prop, effect);
+                }
+            }
+        });
+    });
+}
+
 const EFFECT_HANDLERS = {
     incrementFact({ effect }) {
-        const currentValue =
-            gameState.facts[effect.fact] ?? 0;
+        const currentValue = gameState.facts[effect.fact] ?? 0;
 
         gameState.facts[effect.fact] =
             currentValue + effect.amount;
@@ -59,7 +87,11 @@ const EFFECT_HANDLERS = {
     },
 
     showMessage({ effect }) {
-        showMessage(effect.pages);
+        showMessage(effect.pages, effect.propId);
+    },
+
+    showMenu({ prop, effect }) {
+        openMenu(prop, effect);
     },
 
     pickUpItem({ prop }) {
@@ -86,6 +118,13 @@ const EFFECT_HANDLERS = {
 
     removeItem({ effect }) {
         removeInventoryItem(effect.itemId);
+    },
+
+    removeProp({ prop }) {
+        gameState.props[prop.id] = {
+            ...gameState.props[prop.id],
+            removed: true
+        };
     }
 };
 
@@ -105,25 +144,11 @@ export function interactWithProp(prop) {
         : [onClick];
 
     for (const interaction of interactions) {
-        const conditions = interaction.conditions ?? [];
-
-        if (!conditionsPass(prop, conditions)) {
+        if (!conditionsPass(prop, interaction.conditions)) {
             continue;
         }
 
-        for (const effect of interaction.effects ?? []) {
-            const handler = EFFECT_HANDLERS[effect.type];
-
-            if (!handler) {
-                console.warn(
-                    `Unknown effect type: ${effect.type}`
-                );
-                continue;
-            }
-
-            handler({ prop, effect });
-        }
-
+        runEffects(prop, interaction.effects);
         return;
     }
 }

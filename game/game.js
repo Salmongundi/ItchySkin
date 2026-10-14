@@ -282,8 +282,9 @@ function loadScene(sceneId) {
 
     currentScene = {
         ...scene,
-        props: (scene.props ?? []).filter(
-            prop => !gameState.props[prop.id]?.pickedUp
+        props: (scene.props ?? []).filter(prop =>
+            !gameState.props[prop.id]?.pickedUp &&
+            !gameState.props[prop.id]?.removed
         )
     };
 
@@ -479,13 +480,15 @@ function render() {
     const palette = getCurrentPalette();
 
     ctx.fillStyle = palette.foreground;
+    artworkGeometry = drawAscii(ctx, currentAnimation.frame);
 
-    artworkGeometry = drawAscii(
-        ctx,
-        currentAnimation.frame
+    currentScene.props = (currentScene.props ?? []).filter(
+        prop =>
+            !gameState.props[prop.id]?.pickedUp &&
+            !gameState.props[prop.id]?.removed
     );
 
-    for (const prop of currentScene.props ?? []) {
+    for (const prop of currentScene.props) {
         const artwork = getPropArtwork(prop);
 
         drawAsciiAt(
