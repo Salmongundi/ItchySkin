@@ -83,7 +83,7 @@ import {
 // #region CONSTANTS
 
 const NAVIGATION_EDGE_RATIO = 0.05;
-const START_SCENE = "jerboaTent";
+const START_SCENE = "neighborWindow";
 const CURSORS = {
     up: upCursor,
     right: rightCursor,

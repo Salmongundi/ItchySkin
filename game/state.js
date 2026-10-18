@@ -1,7 +1,8 @@
 
 export const gameState = {
     facts: {
-        foodEaten: 0
+        foodEaten: 0,
+        jerboaLeftTent: false
     },
 
     inventory: [],

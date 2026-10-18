@@ -1,0 +1,148 @@
+
+export const waterPipe = {
+    states: {
+        original: {
+            idle: [
+                `                                                  
+                                                  
+              ::@@@@@@@@+                         
+          .+@@@@@@#@%@@@@@@@=                     
+         @@@+   :%@@@+@@*  @@@*                   
+       .@@* -@@@*- =@@   @@  @@+                  
+       @@@@@.    -*++.     @@+@@.                 
+       @@@:@+ %@@@@@@@@@@@# -@@@@                 
+       @@ .:.@@@=     : @@@@@=@@                  
+       @@@  @@@           @@+ @@                  
+        +@@@@@@  -@@@@@@@@@@@@#                   
+         =@@@@@@@@@%*-  :+@@@@                    
+            =@@@   .+%@#*   .@@@                  
+            #@-  *@@@@%@@@@@: @@@                 
+           =@@  @@#        @@@@@@                 
+            @@@#@%         *@@@@                  
+             @@@@@          %@@:   -@@%-          
+               .@@-           @@@+#@@-%@@@        
+                @@#             #@@@@@  :@@.      
+                 -@@               %@+  *@+       
+                  #@@@            :@@- =@@        
+                    %@@@          *@@  @@@        
+                      @@@@+       @@. :@@.        
+                         *@@@@+: @@@  *@@         
+                            .=@@@@@*  @@@         
+                                -@@+*@@@          
+                                 @@@@@@           
+                                                  
+                                                  
+                                                  `
+            ]
+        },
+
+        leaking: {
+            idle: [
+                `                                                                                                    
+                     @@@@#                                                                          
+                    @@   @@                                                                         
+                    @@    @*@@@@                                                                    
+                     @@   @@@* @@                                                                   
+                      @@  @@@  @@                                                                   
+                      @@  @@@  @@                                                                   
+                      @@  @*@@ @@                                                                   
+                     @@@@@@ @@@@@@@@@@@@@@@@@@                                                      
+                   @@@    @@@@@              @@@                                                    
+                   @@      *@=                 @@@                                                  
+                  @@    @@@@                     :@@*                @@@@@@@@@.                     
+                  @@    @@@@                        @@@           @@@@@@@@@@@@@@@                   
+                 @@                                 #@@@@@@** *@@@@@           @@@*                 
+                 @@                 @@               @@@@@@@@@@@                 @@                 
+                 @@@@@@@@           @@ @@            @@@@@@@@                    @@@                
+                        @@@@@      @@ @@:            @@@@@+                       @@@               
+                            =@@@@@@% @@              @@@                           @@               
+                     @@@@@@@@@@@@  @@@@             @@@                            @@@          @@  
+                     @@@@@@@@@@@@@@@ @@@@@@@@@@@@@@@@@                              @@@       @@@   
+                                     @@@@      @@@@@@@@                              @@@@@@@@@=     
+                                      @@    %@@@@@@   @@                                            
+                                   @@@@@@@@@@@@@@@@+ @@@                                            
+                                 @@@   #  @@@  @@@ @@@                                              
+                                   @@@@@@@   @@@ @@+                                                
+                                           @@@@@@@                                                  
+                                    @@@@@@@.@@@                                                     
+                                    @@@@@@@@@                                                       
+                                                                                                    
+                                                                                                    `
+            ]
+        }
+    }
+};
+
+
+
+
+export const waterPipeDefinition = {
+    artwork: waterPipe,
+    initialState: "original",
+
+onClick: {
+    effects: [
+        {
+            type: "showMenu",
+            choices: [
+                { label: "What are you doing pipe-senpai?",
+                    pages: [
+                        {
+                            text: "I come here every morning to play pool with whatever falls out of the skinflaps and backhair of the guy that sleeps here.",
+                            propId: "jerboa"
+                        },
+                        {
+                            text: "I'd love to play on a real pool table someday. Especially because these slimy bedsheets irritate my feet something fierce.",
+                            propId: "jerboa"
+                        }
+                    ]
+                },
+                { label: "Can I eat those blueberries?",
+                    pages: [
+                        {
+                            text: "Absolutely not! Blueberries are an integral part of my makeshift, bed-tent-based pool table.",
+                            propId: "jerboa"
+                        }
+                    ]
+                },
+                { label: "Hey, do you want this membership card for the pool hall?",
+                    conditions: [
+                        {
+                            type: "hasItem",
+                            itemId: "poolHallMembershipCard"
+                        }
+                    ],
+                    pages: [
+                        {
+                            text: "Jerboa looks at you with joyful tears streaming down his surprised snoot."
+                        },
+                        {
+                            text: "I can't believe someone would offer such a generous gift to a jerboa with such a low Elo rating.",
+                            propId: "jerboa"
+                        },
+                        {
+                            text: "I'm going to play against Fats in the pool hall right now to earn my title as the best player in the apartment!",
+                            propId: "jerboa"
+                        }
+                    ],
+                    effects: [
+                        {
+                            type: "removeItem",
+                            itemId: "poolHallMembershipCard"
+                        },
+                        {
+                            type: "setFact",
+                            fact: "jerboaLeftTent",
+                            value: true
+                        },
+                        {
+                            type: "removeProp"
+                        }
+                    ],
+                    returnToMenu: false
+                }
+            ]
+        }
+    ]
+}
+};

@@ -76,33 +76,6 @@ export const bathroomScenes = {
         ]
     },
 
-    //MARK: Shower Interior
-    showerInterior: {
-        animation: {
-            frames: [
-                showerInterior_001,
-                showerInterior_002,
-                showerInterior_003,
-                showerInterior_002
-            ],
-            frameDuration: 550
-        },
-
-        props: [
-            {
-                id: "pizza",
-                definition: pizzaDefinition,
-                column: 61,
-                row: 36,
-                scale: 0.35
-            }
-        ],
-
-        navigation: {
-            down: "bathroomEntrance"
-        }
-    },
-
     // MARK: Bathroom Exit
     bathroomExit: {
         animation: {
@@ -148,6 +121,19 @@ export const bathroomScenes = {
                 },
 
                 cursor: "up"
+            },
+
+            {
+                destination: "neighborWindow",
+
+                area: {
+                    column: 92,
+                    row: 25,
+                    width: 13,
+                    height: 17
+                },
+
+                cursor: "right"
             }
         ]
     },
@@ -239,6 +225,33 @@ export const bathroomScenes = {
             down: "bathroomInteriorLeft"
         }
     },
+
+    //MARK: Shower Interior
+    showerInterior: {
+        animation: {
+            frames: [
+                showerInterior_001,
+                showerInterior_002,
+                showerInterior_003,
+                showerInterior_002
+            ],
+            frameDuration: 550
+        },
+
+        props: [
+            {
+                id: "pizza",
+                definition: pizzaDefinition,
+                column: 61,
+                row: 36,
+                scale: 0.35
+            }
+        ],
+
+        navigation: {
+            down: "bathroomEntrance"
+        }
+    }
 
 };
 // #endregion

@@ -16,7 +16,12 @@ const CONDITION_HANDLERS = {
 
     hasItem({ condition }) {
         return hasItem(condition.itemId);
-    }
+    },
+
+    // Check if a fact has a specific value.
+    factIs({ condition }) {
+        return gameState.facts[condition.fact] === condition.value;
+    },
 };
 
 function conditionsPass(prop, conditions = []) {
@@ -72,6 +77,8 @@ function openMenu(prop, effect) {
 }
 
 const EFFECT_HANDLERS = {
+
+    // Increment a fact by a specified amount.
     incrementFact({ effect }) {
         const currentValue = gameState.facts[effect.fact] ?? 0;
 
@@ -79,6 +86,13 @@ const EFFECT_HANDLERS = {
             currentValue + effect.amount;
     },
 
+
+    // Set a fact to a specific value.
+    setFact({ effect }) {
+        gameState.facts[effect.fact] = effect.value;
+    },
+
+    // Set a prop's state to a specific value.
     setPropState({ prop, effect }) {
         gameState.props[prop.id] = {
             ...gameState.props[prop.id],
@@ -86,14 +100,17 @@ const EFFECT_HANDLERS = {
         };
     },
 
+    // Show a message to the player.
     showMessage({ effect }) {
         showMessage(effect.pages, effect.propId);
     },
 
+    // Show a menu to the player.
     showMenu({ prop, effect }) {
         openMenu(prop, effect);
     },
 
+    // Add an item to the player's inventory.
     pickUpItem({ prop }) {
         const item = prop.definition.inventoryItem;
 

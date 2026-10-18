@@ -25,16 +25,15 @@ import {
     fridgeInterior_003,
     mouseHoleEntrance_001,
     mouseHoleEntrance_002,
-    mouseHoleEntrance_003
+    neighborWindow_001,
+    neighborWindow_002
 } from "../assets/ascii/environments/livingRoom.js";
 
-import {
-    drillDefinition
-} from "../assets/ascii/props/powerDrill.js";
-
-import {
-    jerboaDefinition
-} from "../assets/ascii/props/jerboa.js";
+import {drillBitDefinition} from "../assets/ascii/props/drillBit.js";
+import {drillDefinition} from "../assets/ascii/props/powerDrill.js";
+import {jerboaDefinition} from "../assets/ascii/props/jerboa.js";
+import {neighborDefinition} from "../assets/ascii/props/neighbor.js";
+import {waterPipeDefinition} from "../assets/ascii/props/waterPipe.js";
 
 
 // #endregion
@@ -202,12 +201,19 @@ export const livingRoomScenes = {
 
         props: [
             {
+                id: "drillBit",
+                definition: drillBitDefinition,
+                column: 100,
+                row: 3,
+                scale: .18
+            },
+            {
                 id: "jerboa",
                 definition: jerboaDefinition,
-                column: 25,
-                row: 1,
-                scale: 1
-            }
+                column: 45,
+                row: 15,
+                scale: .5
+            },
         ],
 
         navigation: {
@@ -231,7 +237,8 @@ export const livingRoomScenes = {
         props: [],
 
         navigation: {
-            down: "bathroomExit"
+            down: "bathroomExit",
+            right: "neighborWindow"
         },
 
         navigationAreas: [
@@ -360,8 +367,6 @@ export const livingRoomScenes = {
         animation: {
             frames: [
                 mouseHoleEntrance_001,
-                mouseHoleEntrance_002,
-                mouseHoleEntrance_003,
                 mouseHoleEntrance_002
             ],
             frameDuration: 550
@@ -387,7 +392,42 @@ export const livingRoomScenes = {
                 cursor: "up"
             }
         ]
-    }
+    },
+
+
+    // MARK: Neighbor Window
+    neighborWindow: {
+        animation: {
+            frames: [
+                neighborWindow_001,
+                neighborWindow_002
+            ],
+            frameDuration: 550
+        },
+
+        props: [
+            {
+                id: "neighbor",
+                definition: neighborDefinition,
+                column: 145,
+                row: 18,
+                scale: .9
+            },
+
+            {
+                id: "waterPipe",
+                definition: waterPipeDefinition,
+                column: 16,
+                row: 5,
+                scale: .5
+            }
+        ],
+
+        navigation: {
+            down: "bathroomExit",
+            left: "livingRoomNorth"
+        }
+    },
 
 };
 // #endregion

@@ -251,6 +251,11 @@ onClick: {
                             itemId: "poolHallMembershipCard"
                         },
                         {
+                            type: "setFact",
+                            fact: "jerboaLeftTent",
+                            value: true
+                        },
+                        {
                             type: "removeProp"
                         }
                     ],
