@@ -29,6 +29,7 @@ import {
     neighborWindow_002
 } from "../assets/ascii/environments/livingRoom.js";
 
+import {bouncerMouseDefinition} from "../assets/ascii/props/bouncerMouse.js";
 import {drillBitDefinition} from "../assets/ascii/props/drillBit.js";
 import {drillDefinition} from "../assets/ascii/props/powerDrill.js";
 import {jerboaDefinition} from "../assets/ascii/props/jerboa.js";
@@ -372,7 +373,15 @@ export const livingRoomScenes = {
             frameDuration: 550
         },
 
-        props: [],
+        props: [
+            {
+                id: "bouncerMouse",
+                definition: bouncerMouseDefinition,
+                column: 133,
+                row: 52,
+                scale: .6
+            }
+        ],
 
         navigation: {
             down: "livingRoomNorth"

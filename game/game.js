@@ -83,7 +83,7 @@ import {
 // #region CONSTANTS
 
 const NAVIGATION_EDGE_RATIO = 0.05;
-const START_SCENE = "neighborWindow";
+const START_SCENE = "mouseHoleEntrance";
 const CURSORS = {
     up: upCursor,
     right: rightCursor,
